@@ -1,0 +1,20 @@
+syntax = "proto3";
+package bidder;
+option go_package = "github.com/Gvinay90/ad-bidding-platform/proto/bidder;bidderpb";
+ 
+service BidderService {
+  rpc EvaluateBid(BidRequest) returns (BidResponse);
+}
+ 
+message BidRequest {
+  string request_id = 1;
+  string geo = 2;
+  string device = 3;
+  string category = 4;
+}
+ 
+message BidResponse {
+  bool   has_bid = 1;
+  string winning_campaign_id = 2;
+  int64  price_cents = 3;
+}
