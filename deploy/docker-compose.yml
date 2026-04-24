@@ -1,0 +1,59 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ad
+      POSTGRES_PASSWORD: ad
+      POSTGRES_DB: ad_platform
+    ports: ["5432:5432"]
+    volumes: [ "pgdata:/var/lib/postgresql/data" ]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ad -d ad_platform"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ad_platform
+      MYSQL_USER: ad
+      MYSQL_PASSWORD: ad
+    ports: ["3306:3306"]
+    volumes: [ "mysqldata:/var/lib/mysql" ]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  localstack:
+    image: localstack/localstack:3
+    environment:
+      SERVICES: sns,sqs
+      DEBUG: 0
+    ports: ["4566:4566"]
+    volumes:
+      - "./localstack-init:/etc/localstack/init/ready.d"
+    healthcheck:
+      test: ["CMD-SHELL", "awslocal sns list-topics | grep -q campaign-events"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 30s
+
+volumes:
+  pgdata: {}
+  mysqldata: {}
