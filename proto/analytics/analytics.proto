@@ -1,0 +1,15 @@
+syntax = "proto3";
+package analytics;
+option go_package = "github.com/Gvinay90/ad-bidding-platform/proto/analytics;analyticspb";
+ 
+service AnalyticsService {
+  rpc GetCampaignStats(CampaignStatsRequest) returns (CampaignStatsResponse);
+}
+ 
+message CampaignStatsRequest { string campaign_id = 1; }
+message CampaignStatsResponse {
+  string campaign_id = 1;
+  int64  wins = 2;
+  int64  bids = 3;
+  int64  spend_cents = 4;
+}
