@@ -1,0 +1,49 @@
+syntax = "proto3";
+package campaign;
+option go_package = "github.com/Gvinay90/ad-bidding-platform/proto/campaign;campaignpb";
+ 
+service CampaignService {
+  rpc CreateCampaign(CreateCampaignRequest) returns (CampaignResponse);
+  rpc GetCampaign(GetCampaignRequest)       returns (CampaignResponse);
+  rpc ListCampaigns(ListCampaignsRequest)   returns (ListCampaignsResponse);
+  rpc UpdateCampaign(UpdateCampaignRequest) returns (CampaignResponse);
+  rpc DeleteCampaign(DeleteCampaignRequest) returns (DeleteCampaignResponse);
+}
+ 
+message Campaign {
+  string id = 1;
+  string advertiser_id = 2;
+  string name = 3;
+  int64  budget_cents = 4;
+  int64  bid_price_cents = 5;
+  string geo = 6;
+  string device = 7;
+  string category = 8;
+  string status = 9;
+}
+ 
+message CreateCampaignRequest {
+  string advertiser_id = 1;
+  string name = 2;
+  int64  budget_cents = 3;
+  int64  bid_price_cents = 4;
+  string geo = 5;
+  string device = 6;
+  string category = 7;
+}
+message CampaignResponse { Campaign campaign = 1; }
+message GetCampaignRequest { string id = 1; }
+message ListCampaignsRequest { string advertiser_id = 1; }
+message ListCampaignsResponse { repeated Campaign campaigns = 1; }
+message UpdateCampaignRequest {
+  string id = 1;
+  string name = 2;
+  int64  budget_cents = 3;
+  int64  bid_price_cents = 4;
+  string geo = 5;
+  string device = 6;
+  string category = 7;
+  string status = 8;
+}
+message DeleteCampaignRequest { string id = 1; }
+message DeleteCampaignResponse { string message = 1; }
