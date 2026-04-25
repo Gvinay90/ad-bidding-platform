@@ -1,0 +1,60 @@
+# config/local.yaml
+# Local development configuration.
+# Run `docker compose -f deploy/docker-compose.yml up -d` first so Redis,
+# Postgres, MySQL, and LocalStack are available.
+
+server:
+  campaign_grpc_port:  50051
+  bidder_grpc_port:    50052
+  analytics_grpc_port: 50053
+  gateway_http_port:   8080
+
+  # Addresses the gateway uses to reach each gRPC service.
+  # When everything runs on your laptop, localhost works.
+  campaign_grpc_addr:  "localhost:50051"
+  bidder_grpc_addr:    "localhost:50052"
+  analytics_grpc_addr: "localhost:50053"
+
+database:
+  # driver: sqlite | postgres | mysql
+  # Default to sqlite for zero-setup local runs. Switch to postgres or mysql
+  # any time by changing just these two lines, no code changes.
+  # driver: sqlite
+  # dsn: "file:ad_platform.db?_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)"
+
+  # When you switch driver, use one of these DSNs instead:
+  driver: postgres
+  dsn: "host=localhost user=ad password=ad dbname=ad_platform port=5432 sslmode=disable TimeZone=UTC"
+  # mysql:
+  #   dsn: "ad:ad@tcp(localhost:3306)/ad_platform?charset=utf8mb4&parseTime=True&loc=UTC"
+  # max_open_conns: 10
+  # max_idle_conns: 5
+  # conn_max_lifetime_seconds: 300
+
+redis:
+  addr:      "localhost:6379"
+  db:        0
+  pool_size: 20
+  # Optional. Leave empty if your local Redis has no auth (the default).
+  password:  ""
+
+aws:
+  # LocalStack endpoint. Leave empty in prod to hit real AWS.
+  endpoint:        "http://localhost:4566"
+  region:          "us-east-1"
+  # Topic name only is OK — the service builds a full TopicArn from region + account_id.
+  sns_topic:       "campaign-events"
+  bidder_queue:    "bidder-cache"
+  analytics_queue: "analytics-in"
+
+  # LocalStack accepts any non-empty creds. Real prod uses IAM roles
+  # and these stay empty so the SDK uses the default chain.
+  access_key_id:     "test"
+  secret_access_key: "test"
+
+  # Account id for building queue URLs locally. LocalStack always uses 000000000000.
+  account_id: "000000000000"
+
+log:
+  level:  "info"     # debug | info | warn | error
+  format: "console"  # console | json

@@ -39,3 +39,4 @@ Thumbs.db
 # Local scratch
 tmp/
 .temp/
+*.db

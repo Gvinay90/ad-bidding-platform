@@ -8,6 +8,7 @@ import (
 )
 
 type CampaignHandler struct {
+	campaignpb.UnimplementedCampaignServiceServer
 	service *service.CampaignService
 }
 

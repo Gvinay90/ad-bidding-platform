@@ -23,7 +23,7 @@ type ServerConfig struct {
 
 type DatabaseConfig struct {
 	Driver       string `mapstructure:"driver"`
-	DNS          string `mapstructure:"dns"`
+	DSN          string `mapstructure:"dsn"`
 	MaxOpenConns int    `mapstructure:"max_open_conns"`
 	MaxIdleConns int    `mapstructure:"max_idle_conns"`
 }
@@ -35,11 +35,14 @@ type RedisConfig struct {
 }
 
 type AWSConfig struct {
-	Endpoint       string `mapstructure:"endpoint"`
-	Region         string `mapstructure:"region"`
-	SNSTopic       string `mapstructure:"sns_topic"`
-	BidderQueue    string `mapstructure:"bidder_queue"`
-	AnalyticsQueue string `mapstructure:"analytics_queue"`
+	Endpoint        string `mapstructure:"endpoint"`
+	Region          string `mapstructure:"region"`
+	AccountID       string `mapstructure:"account_id"`
+	SNSTopic        string `mapstructure:"sns_topic"`
+	BidderQueue     string `mapstructure:"bidder_queue"`
+	AnalyticsQueue  string `mapstructure:"analytics_queue"`
+	AccessKeyID     string `mapstructure:"access_key_id"`
+	SecretAccessKey string `mapstructure:"secret_access_key"`
 }
 
 type LogConfig struct {

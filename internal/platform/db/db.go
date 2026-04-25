@@ -15,11 +15,11 @@ func Open(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 
 	switch cfg.Driver {
 	case "postgres":
-		dialector = postgres.Open(cfg.DNS)
+		dialector = postgres.Open(cfg.DSN)
 	case "mysql":
-		dialector = mysql.Open(cfg.DNS)
+		dialector = mysql.Open(cfg.DSN)
 	case "sqlite":
-		dialector = sqlite.Open(cfg.DNS)
+		dialector = sqlite.Open(cfg.DSN)
 	default:
 		return nil, fmt.Errorf("unsupported driver: %s", cfg.Driver)
 	}
