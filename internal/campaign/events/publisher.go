@@ -3,6 +3,7 @@ package events
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 	"time"
 
 	"github.com/Gvinay90/ad-bidding-platform/internal/campaign/domain"
@@ -59,5 +60,10 @@ func (p *Publisher) PublishCampaignChanged(ctx context.Context, t EventType, c *
 		TopicArn: aws.String(p.topicArn),
 		Message:  aws.String(string(body)),
 	})
-	return err
+	if err != nil {
+		slog.ErrorContext(ctx, "sns publish failed", "event_type", t, "campaign_id", ev.CampaignID, "err", err)
+		return err
+	}
+	slog.DebugContext(ctx, "sns publish ok", "event_type", t, "campaign_id", ev.CampaignID, "event_id", ev.EventID)
+	return nil
 }

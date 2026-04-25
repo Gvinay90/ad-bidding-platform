@@ -46,7 +46,8 @@ type AWSConfig struct {
 }
 
 type LogConfig struct {
-	Level string `mapstructure:"level"`
+	Level  string `mapstructure:"level"`
+	Format string `mapstructure:"format"` // console (text) | json
 }
 
 func Load(path string) (*Config, error) {
