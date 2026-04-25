@@ -45,6 +45,17 @@
     └── campaign
 ```
 
+## Generate protobuf
+
+From the repository root:
+
+```bash
+chmod +x scripts/gen-proto.sh
+./scripts/gen-proto.sh
+```
+
+This runs `protoc` on `proto/campaign`, `proto/bidder`, and `proto/analytics`. You need [`protoc`](https://grpc.io/docs/protoc-installation/) plus `protoc-gen-go` and `protoc-gen-go-grpc` on your `PATH` (for example `go install google.golang.org/protobuf/cmd/protoc-gen-go@latest` and `go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest`).
+
 ## Local stack
 
 From `deploy/`:
