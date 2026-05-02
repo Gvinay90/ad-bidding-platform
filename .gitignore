@@ -37,6 +37,6 @@ vendor/
 Thumbs.db
 
 # Local scratch
-tmp/
+tmp/   
 .temp/
 *.db
