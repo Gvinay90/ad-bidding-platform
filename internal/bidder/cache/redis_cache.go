@@ -73,7 +73,7 @@ func (c *Cache) Delete(ctx context.Context, id string) error {
 	return c.rdb.Del(ctx, campaignKey(id)).Err()
 }
 
-func (c *Cache) GetCampaignLite(ctx context.Context, targeting Targeting) ([]CampaignLite, error) {
+func (c *Cache) FindCandidates(ctx context.Context, targeting Targeting) ([]CampaignLite, error) {
 	keys := []string{
 		activeIdx,
 		geoIdx(targeting.Geo),
