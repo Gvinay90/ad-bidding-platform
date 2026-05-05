@@ -14,6 +14,7 @@ import (
 	"github.com/Gvinay90/ad-bidding-platform/internal/platform/awsx"
 	"github.com/Gvinay90/ad-bidding-platform/internal/platform/config"
 	"github.com/Gvinay90/ad-bidding-platform/internal/platform/db"
+	"github.com/Gvinay90/ad-bidding-platform/internal/platform/interceptors"
 	"github.com/Gvinay90/ad-bidding-platform/internal/platform/logx"
 	campaignpb "github.com/Gvinay90/ad-bidding-platform/proto/campaign"
 	"google.golang.org/grpc"
@@ -60,7 +61,7 @@ func main() {
 	h := handler.NewCampaignHandler(svc)
 
 	grpcServer := grpc.NewServer(
-		grpc.ChainUnaryInterceptor(handler.UnarySlogInterceptor(logger)),
+		grpc.ChainUnaryInterceptor(interceptors.UnarySlogInterceptor(logger, "campaign")),
 	)
 	campaignpb.RegisterCampaignServiceServer(grpcServer, h)
 	reflection.Register(grpcServer)
