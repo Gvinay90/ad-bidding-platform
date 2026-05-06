@@ -13,6 +13,24 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 )
 
+// QueueURL returns the canonical queue URL from SQS. With a custom endpoint
+// (LocalStack), it creates the queue if missing so dev does not depend on
+// deploy/localstack-init alone. For real AWS (no endpoint), the queue must exist.
+func QueueURL(ctx context.Context, client *sqs.Client, cfg config.AWSConfig, queueName string) (string, error) {
+	qn := strings.TrimSpace(queueName)
+	if qn == "" {
+		return "", fmt.Errorf("aws: empty queue name")
+	}
+	if strings.TrimSpace(cfg.Endpoint) != "" {
+		_, _ = client.CreateQueue(ctx, &sqs.CreateQueueInput{QueueName: aws.String(qn)})
+	}
+	out, err := client.GetQueueUrl(ctx, &sqs.GetQueueUrlInput{QueueName: aws.String(qn)})
+	if err != nil {
+		return "", err
+	}
+	return aws.ToString(out.QueueUrl), nil
+}
+
 type Client struct {
 	sns *sns.Client
 	sqs *sqs.Client

@@ -88,26 +88,28 @@ func (c *Cache) FindCandidates(ctx context.Context, targeting Targeting) ([]Camp
 		return nil, nil
 	}
 	pipe := c.rdb.Pipeline()
-	cmds := make([]*redis.SliceCmd, 0, len(ids))
+	cmds := make([]*redis.StringCmd, 0, len(ids))
 	for _, id := range ids {
-		cmds = append(cmds, pipe.HMGet(ctx, campaignKey(id), "id", "bid_price"))
+		// Must match Upsert hash fields: bid_price_cents (no "id" field stored on the hash).
+		cmds = append(cmds, pipe.HGet(ctx, campaignKey(id), "bid_price_cents"))
 	}
 	if _, err := pipe.Exec(ctx); err != nil && !errors.Is(err, redis.Nil) {
 		return nil, err
 	}
 	out := make([]CampaignLite, 0, len(cmds))
-	for _, cmd := range cmds {
-		vals, err := cmd.Result()
-		if err != nil || len(vals) < 2 || vals[0] == nil {
-			continue
+	for i, cmd := range cmds {
+		priceStr, err := cmd.Result()
+		if err != nil {
+			if errors.Is(err, redis.Nil) {
+				continue
+			}
+			return nil, err
 		}
-		id, _ := vals[0].(string)
-		priceStr, _ := vals[1].(string)
 		price, perr := strconv.ParseInt(priceStr, 10, 64)
 		if perr != nil {
 			continue
 		}
-		out = append(out, CampaignLite{ID: id, BidPriceCents: price})
+		out = append(out, CampaignLite{ID: ids[i], BidPriceCents: price})
 	}
 	return out, nil
 
