@@ -1,4 +1,4 @@
-package bidder
+package main
 
 import (
 	"context"
@@ -38,13 +38,29 @@ func main() {
 		os.Exit(1)
 	}
 	c := cache.NewCache(rdb)
-	aws, _ := awsx.New(ctx, cfg.AWS)
-	queueURL := fmt.Sprintf("%s/000000000000/%s", cfg.AWS.Endpoint, cfg.AWS.BidderQueue)
-	cons := events.NewConsumer(aws.SQS(), queueURL, c)
+	awsClient, err := awsx.New(ctx, cfg.AWS)
+	if err != nil {
+		slog.Error("failed to create AWS client", "err", err)
+		os.Exit(1)
+	}
+	queueURL, err := awsx.QueueURL(ctx, awsClient.SQS(), cfg.AWS, cfg.AWS.BidderQueue)
+	if err != nil {
+		slog.Error("failed to resolve bidder SQS queue URL", "queue", cfg.AWS.BidderQueue, "err", err)
+		os.Exit(1)
+	}
+	slog.Info("sqs consumer queue", "queue_url", queueURL)
+	cons := events.NewConsumer(awsClient.SQS(), queueURL, c)
 	go cons.Run(ctx) // run consumer in background
 
+	topicARN, err := awsx.EnsureSNSTopic(ctx, awsClient.SNS(), cfg.AWS)
+	if err != nil {
+		slog.Error("failed to ensure SNS topic for bid events", "err", err)
+		os.Exit(1)
+	}
+	bidPub := events.NewBidPublisher(awsClient.SNS(), topicARN)
+
 	svc := service.New(c)
-	hnd := handler.NewBidderHandler(svc)
+	hnd := handler.NewBidderHandler(svc, bidPub)
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(interceptors.UnarySlogInterceptor(logger, "bidder")),
 	)
