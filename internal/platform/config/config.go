@@ -15,10 +15,13 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	CampaignGRPCPort  int `mapstructure:"campaign_grpc_port"`
-	BidderGRPCPort    int `mapstructure:"bidder_grpc_port"`
-	AnalyticsGRPCPort int `mapstructure:"analytics_grpc_port"`
-	GatewayHTTPPort   int `mapstructure:"gateway_http_port"`
+	CampaignGRPCPort  int    `mapstructure:"campaign_grpc_port"`
+	BidderGRPCPort    int    `mapstructure:"bidder_grpc_port"`
+	AnalyticsGRPCPort int    `mapstructure:"analytics_grpc_port"`
+	GatewayHTTPPort   int    `mapstructure:"gateway_http_port"`
+	CampaignGRPCAddr  string `mapstructure:"campaign_grpc_addr"`
+	BidderGRPCAddr    string `mapstructure:"bidder_grpc_addr"`
+	AnalyticsGRPCAddr string `mapstructure:"analytics_grpc_addr"`
 }
 
 type DatabaseConfig struct {

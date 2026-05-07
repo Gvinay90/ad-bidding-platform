@@ -1,0 +1,334 @@
+basePath: /
+definitions:
+  handler.BidRequest:
+    properties:
+      category:
+        example: sports
+        type: string
+      device:
+        example: mobile
+        type: string
+      geo:
+        example: US
+        type: string
+    type: object
+  handler.BidResponse:
+    properties:
+      has_bid:
+        type: boolean
+      price_cents:
+        type: integer
+      winning_campaign_id:
+        type: string
+    type: object
+  handler.Campaign:
+    properties:
+      advertiser_id:
+        type: string
+      bid_price_cents:
+        type: integer
+      budget_cents:
+        type: integer
+      category:
+        type: string
+      device:
+        type: string
+      geo:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+    type: object
+  handler.CreateCampaignRequest:
+    properties:
+      advertiser_id:
+        example: adv-001
+        type: string
+      bid_price_cents:
+        example: 500
+        type: integer
+      budget_cents:
+        example: 100000
+        type: integer
+      category:
+        example: sports
+        type: string
+      device:
+        example: mobile
+        type: string
+      geo:
+        example: US
+        type: string
+      name:
+        example: Summer Sale
+        type: string
+    type: object
+  handler.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  handler.HealthResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  handler.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  handler.StatsResponse:
+    properties:
+      bids:
+        type: integer
+      campaign_id:
+        type: string
+      spend_cents:
+        type: integer
+      wins:
+        type: integer
+    type: object
+  handler.UpdateCampaignRequest:
+    properties:
+      bid_price_cents:
+        example: 750
+        type: integer
+      budget_cents:
+        example: 200000
+        type: integer
+      category:
+        example: tech
+        type: string
+      device:
+        example: desktop
+        type: string
+      geo:
+        example: US
+        type: string
+      name:
+        example: Updated Name
+        type: string
+      status:
+        example: active
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: HTTP → gRPC proxy that exposes Campaign, Bidder, and Analytics services.
+  title: Ad-Bidding Platform API Gateway
+  version: "1.0"
+paths:
+  /bid:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Targeting attributes
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.BidRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.BidResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Submit a bid request and get the winning campaign
+      tags:
+      - bidder
+  /campaigns:
+    get:
+      parameters:
+      - description: Filter by advertiser ID
+        in: query
+        name: advertiser_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.Campaign'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: List campaigns for an advertiser
+      tags:
+      - campaigns
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Campaign payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateCampaignRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.Campaign'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Create a campaign
+      tags:
+      - campaigns
+  /campaigns/{id}:
+    delete:
+      parameters:
+      - description: Campaign ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.MessageResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Delete a campaign
+      tags:
+      - campaigns
+    get:
+      parameters:
+      - description: Campaign ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Campaign'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Get a campaign by ID
+      tags:
+      - campaigns
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Campaign ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateCampaignRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Campaign'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Update a campaign
+      tags:
+      - campaigns
+  /healthz:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.HealthResponse'
+      summary: Health check
+      tags:
+      - health
+  /stats/{id}:
+    get:
+      parameters:
+      - description: Campaign ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.StatsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Get analytics stats for a campaign
+      tags:
+      - analytics
+schemes:
+- http
+swagger: "2.0"

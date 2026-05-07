@@ -42,8 +42,46 @@
 └── services
     ├── analytics
     ├── bidder
-    └── campaign
+    ├── campaign
+    └── gateway
 ```
+
+## API Gateway
+
+The gateway is a thin HTTP → gRPC proxy. Start it after the three gRPC services are up:
+
+```bash
+go run ./services/gateway
+```
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/healthz` | GET | Health check |
+| `/campaigns` | POST | Create campaign |
+| `/campaigns` | GET | List campaigns (`?advertiser_id=`) |
+| `/campaigns/{id}` | GET | Get campaign |
+| `/campaigns/{id}` | PUT | Update campaign |
+| `/campaigns/{id}` | DELETE | Delete campaign |
+| `/bid` | POST | Evaluate a bid |
+| `/stats/{id}` | GET | Get campaign analytics |
+| `/swagger/` | GET | Swagger UI |
+
+### Regenerate Swagger docs
+
+```bash
+cd services/gateway
+go generate   # runs: swag init ...
+```
+
+Or from the repository root:
+
+```bash
+swag init --generalInfo main.go \
+  --dir services/gateway,api-gateway/handler \
+  --output api-gateway/docs
+```
+
+The generated files live in `api-gateway/docs/`. Once the gateway is running, open [http://localhost:8080/swagger/](http://localhost:8080/swagger/) to explore the API interactively.
 
 ## Generate protobuf
 
